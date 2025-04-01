@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, render_template
 from blockchain import Blockchain
-
+import os
 app = Flask(__name__)
 blockchain = Blockchain()
 
@@ -44,4 +44,5 @@ def view_chain():
     return render_template("chain.html", chain=blockchain.chain)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Render sẽ cấp PORT động
+    app.run(host="0.0.0.0", port=port, debug=True)

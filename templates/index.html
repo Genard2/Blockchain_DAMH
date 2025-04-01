@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/">Trang chủ</a>
+        <a href="/transactions/new">Thêm Giao Dịch</a>
+        <a href="#" id="toggleHistory">Lịch Sử Giao Dịch</a>
+        <a href="#" id="mineBlock">Thêm Block</a>
+    </nav>
+    
+    <div class="container">
+        <h1>Blockchain Dashboard</h1>
+        
+        <div class="summary">
+            <div class="card">Tổng Blocks: {{ chain|length }}</div>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>Index</th>
+                    <th>Timestamp</th>
+                    <th>Transactions</th>
+                    <th>Previous Hash</th>
+                </tr>
+                {% for block in chain %}
+                <tr>
+                    <td>{{ block.index }}</td>
+                    <td>{{ block.timestamp }}</td>
+                    <td>
+                        {% for tx in block.transactions %}
+                            <p>{{ tx.sender }} → {{ tx.recipient }}: {{ tx.amount }}</p>
+                        {% endfor %}
+                    </td>
+                    <td>{{ block.previous_hash }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        
+        <div id="transactionHistory" class="table-container" style="display: none;">
+            <h3>Lịch sử Giao Dịch</h3>
+            <table>
+                <tr>
+                    <th>STT</th>
+                    <th>Người gửi</th>
+                    <th>Người nhận</th>
+                    <th>Số tiền</th>
+                    <th>Thời gian</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <script>
+        document.getElementById("mineBlock").addEventListener("click", function() {
+            fetch("/mine", { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+            .catch(error => console.error("Lỗi:", error));
+        });
+
+        document.getElementById("toggleHistory").addEventListener("click", function() {
+            let historyDiv = document.getElementById("transactionHistory");
+            if (historyDiv.style.display === "none") {
+                fetch("/transactions/history")
+                .then(response => response.json())
+                .then(data => {
+                    let table = historyDiv.querySelector("table");
+                    table.innerHTML = "<tr><th>STT</th><th>Người gửi</th><th>Người nhận</th><th>Số tiền</th><th>Thời gian</th></tr>";
+                    data.transactions.forEach((tx, index) => {
+                        table.innerHTML += `<tr><td>${index + 1}</td><td>${tx.sender}</td><td>${tx.recipient}</td><td>${tx.amount}</td><td>${tx.timestamp}</td></tr>`;
+                    });
+                    historyDiv.style.display = "block";
+                })
+                .catch(error => console.error("Lỗi:", error));
+            } else {
+                historyDiv.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>

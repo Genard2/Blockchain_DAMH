@@ -11,7 +11,7 @@
         <a href="/">Trang chủ</a>
         <a href="/transactions/new">Thêm Giao Dịch</a>
         <a href="#" id="toggleHistory">Lịch Sử Giao Dịch</a>
-        <a href="#" id="mineBlock">Thêm Block</a>
+        <a href="{{ url_for('profile') }}">Hồ sơ</a>
     </nav>
     
     <div class="container">
@@ -44,6 +44,7 @@
             </table>
         </div>
         
+        <!-- Section for Transaction History -->
         <div id="transactionHistory" class="table-container" style="display: none;">
             <h3>Lịch sử Giao Dịch</h3>
             <table>
@@ -58,18 +59,7 @@
         </div>
     </div>
 
-
     <script>
-        document.getElementById("mineBlock").addEventListener("click", function() {
-            fetch("/mine", { method: "POST" })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                location.reload();
-            })
-            .catch(error => console.error("Lỗi:", error));
-        });
-
         document.getElementById("toggleHistory").addEventListener("click", function() {
             let historyDiv = document.getElementById("transactionHistory");
             if (historyDiv.style.display === "none") {
@@ -88,6 +78,6 @@
                 historyDiv.style.display = "none";
             }
         });
-    </script>
+    </script>    
 </body>
 </html>

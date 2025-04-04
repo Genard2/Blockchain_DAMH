@@ -2,29 +2,74 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thêm Giao Dịch</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <title>Gửi Giao Dịch</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
-<body class="container mt-5">
-    <h1 class="text-center">Thêm Giao Dịch</h1>
-    <div class="card p-4 shadow">
-        <form id="transaction-form">
+<body class="bg-dark text-light">
+    <div class="container py-5">
+        <h2 class="mb-4 text-center text-warning">Tạo Giao Dịch</h2>
+
+        <form id="transactionForm" class="bg-secondary p-4 rounded shadow">
             <div class="mb-3">
-                <label class="form-label">Người gửi</label>
-                <input type="text" id="sender" class="form-control" required>
+                <label for="sender" class="form-label">Người gửi</label>
+                <input type="text" class="form-control" id="sender" required value="{{ user.username }}" readonly>
             </div>
             <div class="mb-3">
-                <label class="form-label">Người nhận</label>
-                <input type="text" id="recipient" class="form-control" required>
+                <label for="recipient" class="form-label">Người nhận</label>
+                <input type="text" class="form-control" id="recipient" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">Số tiền</label>
-                <input type="number" id="amount" class="form-control" required>
+                <label for="amount" class="form-label">Số tiền</label>
+                <input type="number" class="form-control" id="amount" required min="0.01" step="0.01">
             </div>
-            <button type="submit" class="btn btn-primary w-100">Gửi</button>
+            <button type="submit" class="btn btn-success btn-block">Gửi giao dịch</button>
         </form>
+        <a href="/" class="btn btn-primary">Quay về trang chủ</a>
+        <div id="result" class="mt-4"></div>
     </div>
+
+    <script>
+        document.getElementById('transactionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const sender = document.getElementById('sender').value;
+            const recipient = document.getElementById('recipient').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            // Kiểm tra nếu số tiền nhỏ hơn 0.01
+            if (amount < 0.01) {
+                document.getElementById('result').innerHTML = `<div class="alert alert-danger">❌ Số tiền phải lớn hơn 0.01 HCoin.</div>`;
+                return;
+            }
+
+            const res = await fetch("/transactions/new", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ sender, recipient, amount })
+            });
+
+            const data = await res.json();
+
+            const resultDiv = document.getElementById('result');
+            if (res.ok) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <h5>✅ Giao dịch thành công!</h5>
+                        <p><strong>Block Index:</strong> ${data.block.index}</p>
+                        <p><strong>Hash trước:</strong> ${data.block.previous_hash}</p>
+                        <p><strong>Giao dịch:</strong></p>
+                        <pre>${JSON.stringify(data.block.transactions, null, 2)}</pre>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        ❌ ${data.message || "Có lỗi xảy ra khi gửi giao dịch."}
+                    </div>
+                `;
+            }
+        });
+    </script>
 </body>
 </html>

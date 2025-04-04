@@ -6,7 +6,7 @@ class Config:
 
     # Cấu hình kết nối với PostgreSQL
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'postgresql://postgres:12345678@localhost/dreamteam_db'  # DATABASE_URL sẽ được Render cung cấp khi deploy
+        'postgresql://dreamteam_db_ds9f_user:KacppChoTGT9qspWodzzzkEgixS6TlJw@dpg-cvo2353uibrs738aav40-a/dreamteam_db_ds9f'  # DATABASE_URL sẽ được Render cung cấp khi deploy
 
     # Tắt việc theo dõi sự thay đổi của các đối tượng SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = False
